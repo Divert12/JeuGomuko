@@ -1,10 +1,10 @@
 package model;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.nio.file.Path;
 
@@ -16,10 +16,10 @@ public class Gomoku implements Serializable {
     private final int alignementGagnant;
 
     // Constructor to initialize the game with specified parameters
-    public Gomoku(int tailleGrille, int jetonsDepart, int alignementGagnant) {
+    public Gomoku(int tailleGrille, int jetonsDepart, int alignementGagnant, Joueur j1, Joueur j2) {
         this.grille = new Grille(tailleGrille);
         this.alignementGagnant = alignementGagnant;
-        this.joueurs = new Joueur[2];
+        this.joueurs = new Joueur[]{j1, j2};
         this.joueurActuel = 0;
     }
 
@@ -80,16 +80,50 @@ public class Gomoku implements Serializable {
     }
 
     // Save the game state to a file
-    public void save(Path path) throws IOException {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path.toFile()))) {
-            oos.writeObject(this);
+    public void save(Path path, Joueur joueur1, Joueur joueur2) throws IOException {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(path.toFile()))) {
+            // Sauvegarde des paramètres de base
+            writer.println(this.grille.getTaille());
+            writer.println(this.alignementGagnant);
+            
+            // Sauvegarde des joueurs (passés en paramètres)
+            writer.println(joueur1.getNom() + "," + joueur1.getCouleur() + "," + joueur1.getJetonsRestants());
+            writer.println(joueur2.getNom() + "," + joueur2.getCouleur() + "," + joueur2.getJetonsRestants());
+            
+            // Sauvegarde de la grille
+            for (int i = 0; i < grille.getTaille(); i++) {
+                for (int j = 0; j < grille.getTaille(); j++) {
+                    Case c = grille.getCase(i, j);
+                    writer.print(c.getJoueur() != null ? c.getJoueur().getCouleur().charAt(0) : ".");
+                }
+                writer.println();
+            }
         }
     }
 
     // Load the game state from a file
-    public static Gomoku load(Path path) throws IOException, ClassNotFoundException {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
-            return (Gomoku) ois.readObject();
+    public static Gomoku load(Path path, Joueur[] joueurs) throws IOException {
+    try (BufferedReader reader = new BufferedReader(new FileReader(path.toFile()))) {
+        int taille = Integer.parseInt(reader.readLine());
+        int alignement = Integer.parseInt(reader.readLine());
+        
+        // Lecture des joueurs (ignorée car passés en paramètre)
+        reader.readLine();
+        reader.readLine();
+        
+        Gomoku jeu = new Gomoku(taille, 60, alignement, null, null); // 60 est une valeur par défaut
+        
+        // Lecture de la grille
+        for (int i = 0; i < taille; i++) {
+            String ligne = reader.readLine();
+            for (int j = 0; j < taille; j++) {
+                char c = ligne.charAt(j);
+                if (c != '.') {
+                    jeu.getGrille().getCase(i, j).placerJeton(c == 'R' ? joueurs[0] : joueurs[1]);
+                }
+            }
         }
+        return jeu;
     }
+}
 }

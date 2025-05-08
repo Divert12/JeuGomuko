@@ -35,7 +35,7 @@ public class Main {
         System.out.println("Joueur 2 (Bleu), entrez votre nom : ");
         Joueur j2 = new Joueur(sc.nextLine(), "Bleu", jetonsDepart);
 
-        Gomoku jeu = new Gomoku(taille, jetonsDepart, alignementVictoire);
+        Gomoku jeu = new Gomoku(taille, jetonsDepart, alignementVictoire, j2, j2);
         boolean finJeu = false;
 
         
@@ -86,23 +86,24 @@ public class Main {
 
         sc.close();
 
-            try {
-                Path savePath = Paths.get("sauvegarde.gomoku");
-                jeu.save(savePath);
-                System.out.println("Partie sauvegardée !");
-            } catch (IOException e) {
-                System.err.println("Erreur de sauvegarde : " + e.getMessage());
-            }
-            
-            // Chargement
-            try {
-                Path loadPath = Paths.get("sauvegarde.gomoku");
-                Gomoku jeuCharge = Gomoku.load(loadPath);
-                System.out.println("Partie chargée !");
-                // Continuer avec jeuCharge...
-            } catch (IOException | ClassNotFoundException e) {
-                System.err.println("Erreur de chargement : " + e.getMessage());
-            }
+           // Sauvegarde
+        try {
+            Path savePath = Paths.get("sauvegarde.gomoku");
+            jeu.save(savePath, j1, j2); // Passez les joueurs initialisés
+            System.out.println("Partie sauvegardée !");
+        } catch (IOException e) {
+            System.err.println("Erreur de sauvegarde : " + e.getMessage());
+        }
+
+        // Chargement
+        try {
+            Path loadPath = Paths.get("sauvegarde.gomoku");
+            Joueur[] joueurs = {j1, j2}; // Passez les joueurs existants
+            Gomoku jeuCharge = Gomoku.load(loadPath, joueurs);
+            System.out.println("Partie chargée !");
+        } catch (IOException e) {
+            System.err.println("Erreur de chargement : " + e.getMessage());
         }
     }
 
+}
