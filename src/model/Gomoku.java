@@ -8,14 +8,14 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.nio.file.Path;
 
-// Gomoku class represents the game logic and state
+
 public class Gomoku implements Serializable {
     private Grille grille;
     private Joueur[] joueurs;
     private int joueurActuel;
     private final int alignementGagnant;
 
-    // Constructor to initialize the game with specified parameters
+    
     public Gomoku(int tailleGrille, int jetonsDepart, int alignementGagnant, Joueur j1, Joueur j2) {
         this.grille = new Grille(tailleGrille);
         this.alignementGagnant = alignementGagnant;
@@ -23,7 +23,7 @@ public class Gomoku implements Serializable {
         this.joueurActuel = 0;
     }
 
-    // Method to place a token on the board
+    
     public boolean placerJeton(int ligne, int colonne, Joueur joueur) throws CoupInvalideException {
         Case c = grille.getCase(ligne, colonne);
         if (!c.estVide()) throw new CoupInvalideException("Case occupée !");
@@ -39,7 +39,7 @@ public class Gomoku implements Serializable {
         return verifierVictoire(ligne, colonne);
     }
     
-    // Check if there is an adjacent occupied cell
+    
     private boolean estAdjacenteOccupee(int ligne, int colonne) {
         for (Direction dir : Direction.values()) {
             Case voisin = grille.getCase(ligne, colonne).getVoisin(dir);
@@ -48,27 +48,27 @@ public class Gomoku implements Serializable {
         return false;
     }
 
-    // Get the current game grid
+    
     public Grille getGrille() {
         return this.grille;
     }
 
-    // Get the current player index
+    
     public int getJoueurActuel() {
         return this.joueurActuel;
     }
     
-    // Switch to the next player
+    
     public void changerJoueur() {
         this.joueurActuel = (this.joueurActuel + 1) % 2;
     }
 
-    // Verify if the last move resulted in a victory
+    
     private boolean verifierVictoire(int ligne, int colonne) {
         return grille.getCase(ligne, colonne).estDansAlignement(alignementGagnant);
     }
     
-    // Count alignment in a specific direction
+    
     private int compterAlignement(int ligne, int colonne, Direction dir, Joueur j) {
         int count = 0;
         Case current = grille.getCase(ligne, colonne).getVoisin(dir);
@@ -79,7 +79,7 @@ public class Gomoku implements Serializable {
         return count;
     }
 
-    // Save the game state to a file
+    
     public void save(Path path, Joueur joueur1, Joueur joueur2) throws IOException {
         try (PrintWriter writer = new PrintWriter(new FileWriter(path.toFile()))) {
             // Sauvegarde des paramètres de base
@@ -101,7 +101,7 @@ public class Gomoku implements Serializable {
         }
     }
 
-    // Load the game state from a file
+    
     public static Gomoku load(Path path, Joueur[] joueurs) throws IOException {
     try (BufferedReader reader = new BufferedReader(new FileReader(path.toFile()))) {
         int taille = Integer.parseInt(reader.readLine());
