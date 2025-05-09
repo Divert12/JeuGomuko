@@ -1,0 +1,5 @@
+compiled/
+saved_games/
+*.class
+*.log
+*.gomoku
